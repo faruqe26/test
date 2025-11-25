@@ -24,7 +24,7 @@ jobs:
         run: dotnet restore
 
       - name: Publish .NET app  
-        run: dotnet publish -c Release -o ./publish -p:PublishSingleFile=true -p:SelfContained=false -p:PublishTrimmed=false
+        run: dotnet publish -c Release -o ./publish -r win-x64  -p:PublishSingleFile=true -p:SelfContained=false -p:PublishTrimmed=false
       - name: Create ZIP archive
         run: |
           ls -la ./publish/        # 👈 Debug: see what was published
