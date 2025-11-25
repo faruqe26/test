@@ -2,37 +2,49 @@ name: Build & Release (.NET 9)
 
 on:
   push:
+    branches:
+      - main      # or 'master' if your default branch is named master
+      - master
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   build-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 👈 Explicitly grant at job level
+      contents: write  # Required to create GitHub Releases
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: '9.0.x'
 
-      - name: Restore
+      - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
+      - name: Build project
         run: dotnet build -c Release --no-restore
 
-      - name: Publish (Single File Portable)
-        run:  dotnet publish -c Release -o ./publish \
+      - name: Publish (Single File, Portable)
+        run: dotnet publish -c Release -o ./publish \
              -p:PublishSingleFile=true \
              -p:SelfContained=false \
              -p:PublishTrimmed=false
-      - name: Zip Published Output
+
+      - name: Create ZIP archive
         run: |
           cd publish
           zip -r ../app.zip .
 
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app.zip
+          generate_release_notes: true  # Optional: auto-generate notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
