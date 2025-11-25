@@ -26,9 +26,11 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
-      - name: Publish
-        run: dotnet publish -c Release -o ./publish
-
+      - name: Publish (Single File Portable)
+        run:  dotnet publish -c Release -o ./publish \
+             -p:PublishSingleFile=true \
+             -p:SelfContained=false \
+             -p:PublishTrimmed=false
       - name: Zip Published Output
         run: |
           cd publish
