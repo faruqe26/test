@@ -5,12 +5,11 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: write   # REQUIRED for creating releases
-
 jobs:
   build-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 👈 Explicitly grant at job level
 
     steps:
       - name: Checkout
