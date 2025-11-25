@@ -1,36 +1,40 @@
-name: Build & Publish Artifact (.NET 9)
+name: Build & Release (.NET 9)
 
 on:
   push:
-    branches:
-      - main
-      - master
-  pull_request:
+    tags:
+      - "v*"     # Example: v1.0.0, v1.1.3
 
 jobs:
-  build:
+  build-release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
-      - name: Restore packages
+      - name: Restore
         run: dotnet restore
 
-      - name: Build project
-        run: dotnet build --configuration Release --no-restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
 
-      - name: Publish project
+      - name: Publish
         run: dotnet publish -c Release -o ./publish
 
-      - name: Upload publish artifact
-        uses: actions/upload-artifact@v4
+      - name: Zip Published Output
+        run: |
+          cd publish
+          zip -r ../app.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: sampleapp-dotnet9
-          path: ./publish
+          files: app.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
