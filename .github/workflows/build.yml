@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: write   # REQUIRED for creating releases
 
 jobs:
   build-release:
@@ -39,4 +39,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: app.zip
-       
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
